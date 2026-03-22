@@ -1,0 +1,133 @@
+// ============================
+// 1. ROI: Chainat
+// ============================
+var provinces = ee.FeatureCollection("FAO/GAUL/2015/level1");
+
+var province = provinces
+  .filter(ee.Filter.or(
+    ee.Filter.stringContains('ADM1_NAME', 'Chai Nat'),
+    ee.Filter.stringContains('ADM1_NAME', 'Chainat')
+  ));
+
+var roi = province.geometry();
+Map.centerObject(roi, 9);
+Map.addLayer(province, {}, 'Chainat');
+
+// ============================
+// 2. Sentinel-2
+// ============================
+var bands = ['B2','B3','B4','B8','B11'];
+
+var image = ee.ImageCollection('COPERNICUS/S2_SR')
+  .filterBounds(roi)
+  .filterDate('2023-01-01', '2023-12-31')
+  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
+  .select(bands)
+  .median()
+  .clip(roi);
+
+// ============================
+// 3. Indices
+// ============================
+var ndvi = image.normalizedDifference(['B8', 'B4']).rename('NDVI');
+var ndwi = image.normalizedDifference(['B3', 'B8']).rename('NDWI');
+var ndbi = image.normalizedDifference(['B11', 'B8']).rename('NDBI');
+
+image = image.addBands([ndvi, ndwi, ndbi]);
+
+// ============================
+// 4. Dynamic World (Label)
+// ============================
+var dw = ee.ImageCollection("GOOGLE/DYNAMICWORLD/V1")
+  .filterBounds(roi)
+  .filterDate('2023-01-01', '2023-12-31')
+  .mode();
+
+var label = dw.select('label');
+
+// 1 Water, 2 Agriculture, 3 Forest, 4 Urban, 5 Misc
+var remapped = label.remap(
+  [0, 4, 1, 6, 2, 3, 5, 7],
+  [1, 2, 3, 4, 5, 5, 5, 5]
+).rename('class');
+
+// ============================
+// 5. Sample
+// ============================
+var sample = image.addBands(remapped).sample({
+  region: roi,
+  scale: 10,
+  numPixels: 5000,
+  seed: 42,
+  geometries: true
+});
+
+// ============================
+// 6. Train/Test
+// ============================
+var sampleRandom = sample.randomColumn('random');
+
+var train = sampleRandom.filter(ee.Filter.lt('random', 0.8));
+var test = sampleRandom.filter(ee.Filter.gte('random', 0.8));
+
+// ============================
+// 7. Features
+// ============================
+var features = ['B2','B3','B4','B8','NDVI','NDWI','NDBI'];
+
+// ============================
+// 8. Random Forest (Supervised)
+// ============================
+var rf = ee.Classifier.smileRandomForest(100).train({
+  features: train,
+  classProperty: 'class',
+  inputProperties: features
+});
+
+var classified_rf = image.select(features).classify(rf);
+
+// ============================
+// 9. KMeans (Unsupervised)
+// ============================
+var clusterer = ee.Clusterer.wekaKMeans(5).train({
+  features: train,
+  inputProperties: features
+});
+
+var classified_kmeans = image.select(features).cluster(clusterer);
+
+// ============================
+// 10. Accuracy RF
+// ============================
+var test_rf = test.classify(rf);
+var cm_rf = test_rf.errorMatrix('class', 'classification');
+
+print('RF Confusion Matrix', cm_rf);
+print('RF Accuracy', cm_rf.accuracy());
+print('RF Kappa', cm_rf.kappa());
+
+// ============================
+// 11. Evaluate KMeans
+// ============================
+var clusterSample = classified_kmeans.addBands(remapped).sample({
+  region: roi,
+  scale: 10,
+  numPixels: 3000,
+  seed: 42
+});
+
+var clusterCM = clusterSample.errorMatrix('class', 'cluster');
+print('KMeans vs Class Matrix', clusterCM);
+
+// ============================
+// 12. Feature Importance
+// ============================
+print('Feature Importance', rf.explain());
+
+// ============================
+// 13. Visualization
+// ============================
+var palette = ['blue','yellow','green','red','gray'];
+
+Map.addLayer(classified_rf, {min:1, max:5, palette: palette}, 'RF Classification');
+Map.addLayer(classified_kmeans, {min:0, max:4, palette: palette}, 'KMeans');
