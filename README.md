@@ -24,10 +24,12 @@ Urban PA ≈ 0.47 UA ≈ 0.58 F1 ≈ 0.52
 Agriculture / Urban ค่าไม่ค่อยดีอาจมีการตกหล่นของ class เหล่านี้ 
 Miscellaneous PA ≈ 0.35 UA ≈ 0.64 F1 ≈ 0.45
 Miscellaneous ค่าต่ำมากโมเดลแทบไม่สามารถจำแนก class นี้ได้
-Water ค่า = 0 ยังมีปัญหา อาจจะมี sample น้อย หรือโดนกลบด้วย NDWI threshold 
+Water ค่า = 0 ยังมีปัญหา อาจจะมี sample น้อย หรือโดนกลบด้วย NDWI threshold
 User’s Accuracy (UA) บาง class มีค่า 0.5แปลว่ามี false positive อยู่พอสมควร 
 F1-score Forest มีค่าสูง สมดุลทั้ง precision และ recall) 
 Agriculture / Urban มีค่าปานกลาง Miscellaneous มีค่าต่ำมาก แสดงว่า model ไม่สมดุลในทุก class
+Matrix ของ K-Means ไม่มี accuracy ที่ meaningful cluster ไม่ตรง class และสับสนทุก class
+Random Forest มีประสิทธิภาพสูงกว่า K-Means ในการจำแนกการใช้ประโยชน์ที่ดิน เนื่องจากสามารถใช้ข้อมูลตัวอย่างที่มี label ในการเรียนรู้ ทำให้ผลลัพธ์มีความแม่นยำและสอดคล้องกับสภาพพื้นที่จริงมากกว่า ส่วน K-Means ไม่สามารถจำแนก class ได้อย่างมีประสิทธิภาพ
 ภารกิจที่ 3 
 Feature Importance จาก Random Forest:
 Feature สำคัญ NDVI ใช้แยกพืชได้ดี สำคัญที่สุด NDWI ใช้แยกน้ำ NDBI ใช้แยกเมือง 
