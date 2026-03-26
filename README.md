@@ -1,4 +1,4 @@
-Lab 3
+Lab 3 พื้นที่ศึกษา จังหวัดชัยนาท
 ภารกิจที่ 1 ออกแบบ Training Strategy
 จำแนกที่ดินบ่งเป็น 5 Class ดังนี้ 1 = Water 2 = Agriculture 3 = Forest 4 = Urban 5 = Miscellaneous 
 หา Training Sample โดยการใช้ Dynamic World เนื่องจากประหยัดเวลา
