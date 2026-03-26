@@ -13,18 +13,18 @@ Random Forestทดลองจำนวนต้นไม้
 - 50 trees
 - 100 trees
 - 200 trees
-โดยผลลัพธ์ที่ได้ค่า Accuracy RF50 : 0.771 RF100 : 0.775 RF200 : 0.773
-ค่า Kappa RF50 : 0.426 RF100 : 0.43 RF200: 0.41
+โดยผลลัพธ์ที่ได้ค่า Accuracy RF50 : 0.761 RF100 : 0.771 RF200 : 0.770
+ค่า Kappa RF50 : 0.420 RF100 : 0.441 RF200: 0.438
 โดยจำนวนต้นไม้ที่เพิ่มขึ้นช่วยเพิ่มความแม่นยำเล็กน้อย แต่หลัง 100 trees ประสิทธิภาพเริ่มคงที่
 การเปรียบเทียบ Metrics 
-Random Forest Accuracy ≈ 0.77  Kappa ≈ 0.42 
-Producer’s Accuracy (PA)
-Forest Producer Accuracy ≈ 0.96 User Accuracy ≈ 0.80 F1 ≈ 0.87
-Agriculture PA ≈ 0.48 UA ≈ 1.00 F1 ≈ 0.65
-Urban PA ≈ 0.53 UA ≈ 0.63 F1 ≈ 0.58
+Random Forest Accuracy PA ≈ 0.77 UA ≈ 0.43
+ForestPA ≈ 0.96 UA ≈ 0.80 F1 ≈ 0.87
+Agriculture PA ≈ 0.53 UA ≈ 0.84 F1 ≈ 0.65
+Urban PA ≈ 0.47 UA ≈ 0.58 F1 ≈ 0.52
 Agriculture / Urban ค่าไม่ค่อยดีอาจมีการตกหล่นของ class เหล่านี้ 
-Miscellaneous PA ≈ 0.27 UA ≈ 0.55 F1 ≈ 0.36
-Miscellaneous ค่าต่ำมากโมเดลแทบไม่สามารถจำแนก class นี้ได้ 
+Miscellaneous PA ≈ 0.35 UA ≈ 0.64 F1 ≈ 0.45
+Miscellaneous ค่าต่ำมากโมเดลแทบไม่สามารถจำแนก class นี้ได้
+Water ค่า = 0 ยังมีปัญหา อาจจะมี sample น้อย หรือโดนกลบด้วย NDWI threshold 
 User’s Accuracy (UA) บาง class มีค่า 0.5แปลว่ามี false positive อยู่พอสมควร 
 F1-score Forest มีค่าสูง สมดุลทั้ง precision และ recall) 
 Agriculture / Urban มีค่าปานกลาง Miscellaneous มีค่าต่ำมาก แสดงว่า model ไม่สมดุลในทุก class
